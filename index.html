@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>دعوة حفل زفاف محمد وحنين | بطاقة الدعوة الملكية</title>
+    <title>دعوة حفل زفاف محمد وحنين | بطاقة الدعوة الملكية البحرية</title>
 
     <!-- وسوم المشاركة ومعاينة الروابط في واتساب وشبكات التواصل (Open Graph) -->
     <meta name="description" content="يتشرف كلٌّ من والد العريس ووالد العروس بدعوتكم لحضور حفل زفاف نجليهما المبارك 'محمد وحنين' في اللاذقية - سوريا">
-    <meta property="og:title" content="دعوة حفل زفاف محمد وحنين | بطاقة الدعوة الملكية">
-    <meta property="og:description" content="لا تكتمل فرحتنا وسعادتنا إلا بحضوركم ومشاركتكم أبهى لحظات العمر. انقر للاطلاع على تفاصيل الدعوة وتأكيد الحضور.">
+    <meta property="og:title" content="دعوة حفل زفاف محمد وحنين | بطاقة الدعوة الملكية البحرية">
+    <meta property="og:description" content="لا تكتمل فرحتنا وسعادتنا إلا بحضوركم ومشاركتكم أبهى لحظات العمر على شاطئ البحر. انقر لفتح بطاقة الدعوة وتأكيد الحضور.">
     <meta property="og:image" content="assets/images/memory_1.jpg">
     <meta property="og:type" content="website">
-    <meta name="theme-color" content="#040e1d">
+    <meta name="theme-color" content="#06233d">
 
     <!-- خطوط الويب وأيقونات Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -22,27 +22,84 @@
 </head>
 <body>
 
-    <!-- 1. خلفية الفيديو الحي لأمواج البحر الفاخرة -->
-    <div class="video-bg-container">
-        <video id="ocean-video" class="video-bg" autoplay loop muted playsinline poster="assets/images/video_poster.jpg">
-            <source src="assets/video/bg_ocean.mp4" type="video/mp4">
-        </video>
+    <!-- ==========================================================================
+         شاشة إنترو الفيديو السينمائية الكاملة (Cinematic Fullscreen Video Intro)
+         ========================================================================== -->
+    <div id="intro-screen" class="intro-screen-overlay">
+        <!-- مشغل فيديو الإنترو -->
+        <div class="intro-video-wrapper">
+            <video id="intro-video-player" class="intro-video-player" playsinline autoplay loop muted poster="assets/images/video_poster.jpg">
+                <source src="assets/video/bg_ocean.mp4" type="video/mp4">
+            </video>
+            <div class="intro-ambient-overlay"></div>
+        </div>
+
+        <!-- شريط التحكم العلوي لشاشة الإنترو -->
+        <div class="intro-topbar-controls">
+            <button id="btn-intro-sound" class="btn-intro-sound" title="تشغيل صوت أمواج البحر">
+                <i class="fas fa-volume-up"></i>
+                <span id="intro-sound-label">صوت أمواج البحر</span>
+            </button>
+            <button id="btn-intro-skip" class="btn-intro-skip" title="تخطي إلى بطاقة الدعوة">
+                <span>تخطي إلى الدعوة</span>
+                <i class="fas fa-chevron-left"></i>
+            </button>
+        </div>
+
+        <!-- بطاقة منتصف الإنترو التفاعلية الفاخرة -->
+        <div class="intro-center-card">
+            <div class="intro-nautical-badge">
+                <i class="fas fa-water"></i> حفل زفاف مبارك • 2026
+            </div>
+
+            <!-- المونوغرام البحري -->
+            <div class="intro-monogram-circle">
+                <span class="intro-monogram-text">M & H</span>
+            </div>
+
+            <h1 class="intro-title">دعوة زفاف محمد وحنين</h1>
+            <p class="intro-subtitle">
+                على شواطئ الساحل السوري الساحر، تتلاقى القلوب وتكتمل فرحتنا وسعادتنا بمشاركتكم أسعد لحظات العمر
+            </p>
+
+            <!-- الزر التفاعلي الأكبر لفتح كرت الدعوة والانتقال للموقع -->
+            <button id="btn-open-invitation" class="btn-ocean-open-card">
+                <i class="fas fa-envelope-open-text" style="font-size:1.35rem;"></i>
+                <span>افتح بطاقة الدعوة</span>
+                <i class="fas fa-arrow-down" style="font-size:0.95rem; margin-right:4px;"></i>
+            </button>
+        </div>
+
+        <!-- شريط تقدم تشغيل الفيديو -->
+        <div class="intro-video-progress">
+            <div id="intro-progress-bar" class="intro-progress-bar-fill"></div>
+        </div>
     </div>
-    <div class="video-overlay"></div>
 
-    <!-- جزيئات الإضاءة واللمعان الذهبي -->
-    <div id="sparkles-container" class="sparkles-container"></div>
+    <!-- ستار أمواج البحر للانتقال السينمائي (Wave Curtain Transition) -->
+    <div id="wave-curtain-transition" class="wave-transition-curtain">
+        <svg class="curtain-wave-svg" viewBox="0 0 1440 320" preserveAspectRatio="none">
+            <path fill="#06b6d4" fill-opacity="1" d="M0,192L48,197.3C96,203,192,213,288,197.3C384,181,480,139,576,144C672,149,768,203,864,218.7C960,235,1056,213,1152,181.3C1248,149,1344,107,1392,85.3L1440,64L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
+        </svg>
+        <div class="curtain-body"></div>
+    </div>
 
-    <!-- مسار الصوت المدمج -->
+    <!-- مسار الصوت المدمج لأمواج البحر والموسيقى -->
     <audio id="bg-audio" loop preload="auto">
         <source src="assets/audio/bg_audio.mp3" type="audio/mpeg">
         <source src="assets/audio/bg_audio.m4a" type="audio/mp4">
     </audio>
 
-    <!-- الأزرار العائمة العلوية -->
+    <!-- الأزرار العائمة العلوية الثابتة بصفحة الدعوة -->
     <div class="floating-actions">
+        <!-- زر إعادة مشاهدة الإنترو -->
+        <button id="btn-replay-intro" class="btn-replay-intro" title="مشاهدة إنترو الفيديو من جديد">
+            <i class="fas fa-play-circle"></i>
+            <span>مشاهدة الإنترو</span>
+        </button>
+
         <!-- زر التحكم بالصوت -->
-        <button id="btn-toggle-audio" class="btn-floating-icon" title="تشغيل الأنغام المصاحبة" aria-label="التحكم بالصوت">
+        <button id="btn-toggle-audio" class="btn-floating-icon" title="تشغيل / كتم الصوت" aria-label="التحكم بالصوت">
             <div class="audio-visualizer">
                 <span class="audio-bar"></span>
                 <span class="audio-bar"></span>
@@ -61,7 +118,7 @@
          ========================================================================== -->
     <main class="invitation-wrapper" id="invitation-main">
 
-        <!-- القسم الأول: الترويسة والمونوغرام الملكي وأسماء العائلتين -->
+        <!-- القسم الأول: الترويسة والمونوغرام البحري وأسماء العائلتين -->
         <header class="royal-card hero-section">
             <div class="card-corner card-corner-top-right"></div>
             <div class="card-corner card-corner-top-left"></div>
@@ -76,7 +133,7 @@
                 </p>
             </div>
 
-            <!-- المونوغرام المذهب الدائري -->
+            <!-- المونوغرام البحري المذهب والدوار -->
             <div class="monogram-container">
                 <div class="monogram-ring"></div>
                 <div class="monogram-inner">
@@ -87,7 +144,7 @@
 
             <!-- الألقاب الشرفية ودعوة العائلتين -->
             <div class="honorifics-block">
-                <p class="invitation-intro-text">يتشرف كلٌّ من والد العريس ووالد العروس بدعوتكم لحضور حفل زفاف نجليهما المبارك</p>
+                <p class="invitation-intro-text">يتشرف كلٌّ من والد العريس ووالد العروس بدعوة سيادتكم لحضور حفل زفاف نجليهما المبارك</p>
                 <div class="families-container">
                     <span class="family-title" id="text-groom-family">عائلة السيد عبد الرحمن آل الشريف</span>
                     <span class="family-separator">✦</span>
@@ -97,11 +154,11 @@
 
             <!-- أسماء العروسين بالخط الذهبي الملكي -->
             <div class="couple-names-wrap">
-                <h1 class="couple-names">
+                <h2 class="couple-names">
                     <span id="text-groom-name">محمد</span>
                     <span class="names-connector">و</span>
                     <span id="text-bride-name">حنين</span>
-                </h1>
+                </h2>
             </div>
 
             <div class="royal-divider">
@@ -146,7 +203,7 @@
             </div>
         </section>
 
-        <!-- القسم الثالث: برنامج ومسار الحفل -->
+        <!-- القسم الثالث: برنامج ومراسم الحفل -->
         <section class="royal-card">
             <div class="card-corner card-corner-top-right"></div>
             <div class="card-corner card-corner-top-left"></div>
@@ -155,7 +212,7 @@
 
             <div style="text-align: center;">
                 <h2 class="section-title">برنامج ومراسم الحفل</h2>
-                <p class="section-subtitle">جدول فقرات الليلة المباركة خطوة بخطوة</p>
+                <p class="section-subtitle">جدول فقرات الليلة المباركة خطوة بخطوة على إطلالة البحر</p>
             </div>
 
             <div class="itinerary-timeline" id="itinerary-timeline-container">
@@ -173,7 +230,7 @@
             <div class="gallery-section-header">
                 <div>
                     <h2 class="section-title" style="margin-bottom:4px;">ذكريات وقصة حب</h2>
-                    <p style="font-size:0.95rem; color:var(--text-secondary);">محطات جمعتنا نسعد بمشاركتها معكم</p>
+                    <p style="font-size:0.95rem; color:var(--text-secondary);">محطات شاطئية وبحرية جمعتنا نسعد بمشاركتها معكم</p>
                 </div>
                 <button id="btn-toggle-gallery" class="btn-toggle-gallery">
                     <i class="fas fa-chevron-up"></i> إخفاء المعرض
@@ -205,13 +262,13 @@
                 الكورنيش البحري الشمالي، طريق الشاطئ الأزرق، الواجهة البحرية
             </p>
 
-            <div style="color:var(--gold-light); font-weight:700; margin-bottom:20px; font-size:1.1rem;" id="text-wedding-date">
+            <div style="color:var(--color-seafoam-light); font-weight:700; margin-bottom:20px; font-size:1.15rem;" id="text-wedding-date">
                 الخميس، 15 تشرين الأول (أكتوبر) 2026 - الساعة 07:30 مساءً
             </div>
 
             <!-- شبكة أزرار الوصول والتقويم -->
             <div class="action-buttons-grid">
-                <a href="#" id="btn-open-map" class="btn-royal-action btn-gold-solid">
+                <a href="#" id="btn-open-map" class="btn-royal-action btn-ocean-solid">
                     <i class="fas fa-location-arrow"></i> الاتجاهات عبر خرائط Google
                 </a>
                 <button id="btn-add-calendar" class="btn-royal-action btn-glass-outline">
@@ -278,7 +335,7 @@
                         <textarea id="rsvp-notes" class="form-textarea" placeholder="شارك العروسين دعواتك الصادقة وكلماتك العطرة لتظهر في حائط التهاني..."></textarea>
                     </div>
 
-                    <button type="submit" class="btn-royal-action btn-gold-solid btn-submit-rsvp">
+                    <button type="submit" class="btn-royal-action btn-ocean-solid btn-submit-rsvp">
                         <i class="fas fa-paper-plane"></i> إرسال تأكيد الحضور والمباركة
                     </button>
                 </form>
@@ -287,10 +344,10 @@
             <!-- حائط الأمنيات المباشر (Wall of Wishes) -->
             <div class="wishes-wall-section">
                 <div style="text-align:center;">
-                    <h3 style="color:var(--gold-light); font-size:1.35rem; margin-bottom:6px;">
-                        <i class="fas fa-feather-alt"></i> حائط تهاني وأمنيات الأحباب
+                    <h3 style="color:var(--color-seafoam-light); font-size:1.4rem; margin-bottom:6px;">
+                        <i class="fas fa-water"></i> حائط تهاني وأمنيات الأحباب
                     </h3>
-                    <p style="font-size:0.9rem; color:var(--text-secondary);">رسائل ومباركات الضيوف الكرام للعروسين</p>
+                    <p style="font-size:0.92rem; color:var(--text-secondary);">رسائل ومباركات الضيوف الكرام للعروسين</p>
                 </div>
                 <div class="wishes-grid" id="wishes-wall-grid">
                     <!-- يتم العرض برمجياً عبر js -->
@@ -441,7 +498,6 @@
 
             <!-- تبويب 1: جدول المدعوين -->
             <div id="tab-content-rsvps">
-                <!-- شريط أدوات الفلترة والبحث وتصدير الإكسل -->
                 <div class="admin-controls-bar">
                     <div class="search-box-wrap">
                         <i class="fas fa-search search-icon-pos"></i>
@@ -464,7 +520,6 @@
                     </div>
                 </div>
 
-                <!-- جدول البيانات -->
                 <div class="admin-table-container">
                     <div style="overflow-x: auto;">
                         <table class="admin-table">
@@ -501,7 +556,7 @@
             <!-- تبويب 3: إعدادات وتخصيص الحفل -->
             <div id="tab-content-settings" style="display: none;">
                 <div class="admin-settings-card">
-                    <h3 style="color:var(--gold-light); font-size:1.3rem; margin-bottom:20px;">
+                    <h3 style="color:var(--color-seafoam-light); font-size:1.3rem; margin-bottom:20px;">
                         <i class="fas fa-edit"></i> تعديل بيانات وتفاصيل حفل الزفاف
                     </h3>
 
@@ -538,13 +593,13 @@
                             <input type="text" id="set-venue-address" class="form-input" required>
                         </div>
 
-                        <div class="form-group" style="border-top:1px dashed rgba(212,175,55,0.3); padding-top:20px; margin-top:20px;">
+                        <div class="form-group" style="border-top:1px dashed rgba(45,212,191,0.4); padding-top:20px; margin-top:20px;">
                             <label class="form-label" for="set-admin-pin" style="color:#f87171;">رمز المرور السري للوحة التحكم (PIN)</label>
                             <input type="password" id="set-admin-pin" class="form-input" maxlength="6" style="max-width:200px;">
                             <small style="color:var(--text-muted); display:block; margin-top:5px;">يمكنك تغيير رمز المرور السري للدخول إلى هذه اللوحة في أي وقت</small>
                         </div>
 
-                        <button type="submit" class="btn-save-settings">
+                        <button type="submit" class="btn-save-settings" style="background:var(--turquoise-gradient); color:#041a2e;">
                             <i class="fas fa-save"></i> حفظ كافة التعديلات فوراً
                         </button>
                     </form>
@@ -568,18 +623,18 @@
 
     <!-- مودال نجاح تأكيد الحضور مع خيار الإرسال عبر الواتساب -->
     <div id="rsvp-success-modal" class="lightbox-modal">
-        <div style="background:rgba(8, 28, 55, 0.95); border:1px solid var(--gold-primary); border-radius:24px; padding:35px 25px; max-width:440px; text-align:center; box-shadow:var(--glass-shadow); position:relative;">
-            <div style="width:70px; height:70px; border-radius:50%; background:rgba(34,197,94,0.2); border:2px solid #22c55e; color:#4ade80; display:flex; align-items:center; justify-content:center; margin:0 auto 18px; font-size:2rem;">
+        <div style="background:rgba(6, 35, 61, 0.96); border:2px solid var(--color-seafoam-bright); border-radius:26px; padding:38px 28px; max-width:460px; text-align:center; box-shadow:var(--glass-shadow); position:relative;">
+            <div style="width:72px; height:72px; border-radius:50%; background:rgba(45,212,191,0.2); border:2px solid var(--color-seafoam-bright); color:var(--color-seafoam-light); display:flex; align-items:center; justify-content:center; margin:0 auto 18px; font-size:2.2rem; box-shadow:var(--ocean-glow);">
                 <i class="fas fa-check"></i>
             </div>
-            <h3 style="color:#fff; font-size:1.4rem; margin-bottom:10px;">تم تسجيل ردكم الكريم بنجاح!</h3>
-            <p id="success-modal-message" style="color:var(--text-secondary); font-size:0.95rem; margin-bottom:25px; line-height:1.7;">
-                أهلاً وسهلاً بكم، تسعدنا وتشرفنا مشاركتكم لنا فرحة العمر.
+            <h3 style="color:#fff; font-size:1.45rem; margin-bottom:10px;">تم تسجيل ردكم الكريم بنجاح!</h3>
+            <p id="success-modal-message" style="color:var(--text-secondary); font-size:0.98rem; margin-bottom:26px; line-height:1.7;">
+                أهلاً وسهلاً بكم، تسعدنا وتشرفنا مشاركتكم لنا فرحة العمر على شاطئ البحر.
             </p>
 
             <div style="display:flex; flex-direction:column; gap:12px;">
-                <a id="btn-send-whatsapp-confirm" href="#" target="_blank" class="btn-royal-action" style="background:#25D366; color:#fff; text-decoration:none; justify-content:center;">
-                    <i class="fab fa-whatsapp" style="font-size:1.2rem;"></i> إرسال تأكيد الرد عبر WhatsApp مباشرة
+                <a id="btn-send-whatsapp-confirm" href="#" target="_blank" class="btn-royal-action" style="background:#25D366; color:#fff; text-decoration:none; justify-content:center; font-size:1.05rem;">
+                    <i class="fab fa-whatsapp" style="font-size:1.25rem;"></i> إرسال تأكيد الرد عبر WhatsApp مباشرة
                 </a>
                 <button id="btn-close-success-modal" class="btn-royal-action btn-glass-outline" style="justify-content:center;">
                     إغلاق والعودة للدعوة

@@ -1,28 +1,32 @@
 /**
  * السكربت الرئيسي لتشغيل وتفاعل موقع دعوة زفاف محمد وحنين
- * Main Application Logic - Wedding Invitation Platform
+ * ثيم أمواج البحر الفيروزية الصافية والإنترو السينمائي الكامل
+ * Main Application Logic - Royal Ocean Wedding Platform
  */
 
 document.addEventListener('DOMContentLoaded', function() {
     // 1. تهيئة البيانات والتطبيق
     initApp();
 
-    // 2. التحكم بالفيديو والصوت
+    // 2. التحكم بشاشة الإنترو السينمائية وانتقال أمواج البحر
+    initOceanVideoIntro();
+
+    // 3. التحكم بالصوت والموسيقى البحرية
     initMediaControls();
 
-    // 3. العدادات التنازلية الثلاثية
+    // 4. العدادات التنازلية الثلاثية (أيام، ساعات، دقائق)
     initCountdown();
 
-    // 4. معرض الذكريات واللايت بوكس
+    // 5. معرض الذكريات واللايت بوكس (Overlapping Zig-Zag Layout)
     initMemoriesGallery();
 
-    // 5. نموذج تأكيد الحضور وحائط الأمنيات
+    // 6. نموذج تأكيد الحضور وحائط الأمنيات المباشر
     initRSVPAndWishes();
 
-    // 6. التكامل مع التقويم والمشاركة
+    // 7. التكامل مع التقويم والمشاركة وخرائط جوجل
     initCalendarAndShare();
 
-    // 7. توجيه ومراقبة مسار الإدارة (#admin)
+    // 8. توجيه ومراقبة مسار الإدارة (#admin)
     initRouting();
 });
 
@@ -32,7 +36,6 @@ let weddingData = null;
 function initApp() {
     weddingData = window.WeddingStorage.getInfo();
     applyWeddingData();
-    createSparkles();
 }
 
 // تطبيق وعرض بيانات الحفل على عناصر الصفحة
@@ -48,8 +51,8 @@ function applyWeddingData() {
     // العائلات والألقاب
     const groomFamEl = document.getElementById('text-groom-family');
     const brideFamEl = document.getElementById('text-bride-family');
-    if (groomFamEl) groomFamEl.textContent = weddingData.groomFamily || 'عائلة آل الشريف';
-    if (brideFamEl) brideFamEl.textContent = weddingData.brideFamily || 'عائلة آل الأحمد';
+    if (groomFamEl) groomFamEl.textContent = weddingData.groomFamily || 'عائلة السيد عبد الرحمن آل الشريف';
+    if (brideFamEl) brideFamEl.textContent = weddingData.brideFamily || 'عائلة السيد مصطفى آل الأحمد';
 
     // المونوغرام
     const monoEnEl = document.getElementById('monogram-letters-en');
@@ -84,39 +87,122 @@ function applyWeddingData() {
 window.applyWeddingData = applyWeddingData;
 
 // ==========================================================================
-// التحكم بالفيديو والمؤثر الصوتي (Video & Audio Engine)
+// 1. التحكم بشاشة الإنترو وانتقال أمواج البحر (Ocean Intro & Wave Curtain)
+// ==========================================================================
+function initOceanVideoIntro() {
+    const introScreen = document.getElementById('intro-screen');
+    const video = document.getElementById('intro-video-player');
+    const progressBar = document.getElementById('intro-progress-bar');
+    const btnOpen = document.getElementById('btn-open-invitation');
+    const btnSkip = document.getElementById('btn-intro-skip');
+    const btnSound = document.getElementById('btn-intro-sound');
+    const soundLabel = document.getElementById('intro-sound-label');
+    const curtain = document.getElementById('wave-curtain-transition');
+    const btnReplay = document.getElementById('btn-replay-intro');
+
+    if (!introScreen || !video) return;
+
+    // محاولة تشغيل الفيديو بصوت أو صامت لتجاوز قيود المتصفح
+    video.muted = true;
+    video.play().catch(() => {
+        console.log('Video auto-play awaiting user gesture');
+    });
+
+    // تحديث شريط التقدم للإنترو
+    video.addEventListener('timeupdate', function() {
+        if (video.duration) {
+            const pct = (video.currentTime / video.duration) * 100;
+            if (progressBar) progressBar.style.width = pct + '%';
+        }
+    });
+
+    // زر التحكم بالصوت في شاشة الإنترو
+    if (btnSound) {
+        btnSound.addEventListener('click', function(e) {
+            e.stopPropagation();
+            if (video.muted) {
+                video.muted = false;
+                video.play().catch(() => {});
+                btnSound.innerHTML = '<i class="fas fa-volume-up"></i> <span>كتم الصوت</span>';
+                isAudioPlaying = true;
+                updateAudioButtonUI(true);
+            } else {
+                video.muted = true;
+                btnSound.innerHTML = '<i class="fas fa-volume-mute"></i> <span>صوت أمواج البحر</span>';
+                isAudioPlaying = false;
+                updateAudioButtonUI(false);
+            }
+        });
+    }
+
+    // دالة الانتقال الساحر من الإنترو إلى بطاقة الدعوة بواسطة تموج البحر
+    function openInvitation() {
+        if (curtain) {
+            curtain.classList.add('active');
+            setTimeout(() => {
+                introScreen.classList.add('hidden');
+                video.pause();
+
+                // تشغيل صوت أمواج البحر في الخلفية بعد فتح الدعوة
+                const bgAudio = document.getElementById('bg-audio');
+                if (bgAudio) {
+                    bgAudio.currentTime = 0;
+                    bgAudio.play().then(() => {
+                        isAudioPlaying = true;
+                        updateAudioButtonUI(true);
+                    }).catch(() => {});
+                }
+
+                setTimeout(() => {
+                    curtain.classList.add('sweep-out');
+                    setTimeout(() => {
+                        curtain.classList.remove('active', 'sweep-out');
+                    }, 900);
+                }, 400);
+            }, 500);
+        } else {
+            introScreen.classList.add('hidden');
+            video.pause();
+        }
+    }
+
+    if (btnOpen) {
+        btnOpen.addEventListener('click', openInvitation);
+    }
+
+    if (btnSkip) {
+        btnSkip.addEventListener('click', openInvitation);
+    }
+
+    // انتهاء مدة الفيديو تلقائياً يفتح الدعوة بسلاسة
+    video.addEventListener('ended', function() {
+        openInvitation();
+    });
+
+    // زر إعادة مشاهدة الإنترو في أي وقت
+    if (btnReplay) {
+        btnReplay.addEventListener('click', function() {
+            introScreen.classList.remove('hidden');
+            video.currentTime = 0;
+            video.play().catch(() => {});
+            if (progressBar) progressBar.style.width = '0%';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    }
+}
+
+// ==========================================================================
+// 2. التحكم بالصوت والموسيقى البحرية (Audio Engine)
 // ==========================================================================
 function initMediaControls() {
-    const video = document.getElementById('ocean-video');
     const audio = document.getElementById('bg-audio');
     const audioBtn = document.getElementById('btn-toggle-audio');
 
     if (!audioBtn) return;
 
-    // محاولة تشغيل الفيديو بسلاسة مع كتم الصوت تلقائياً لتوافق المتصفحات
-    if (video) {
-        video.muted = true;
-        video.play().catch(e => {
-            console.log('Video autoplay waiting for interaction');
-        });
-    }
-
-    // زر التحكم العائم بالصوت
     audioBtn.addEventListener('click', function() {
         toggleAudioPlayback();
     });
-
-    // تفاعل تشغيل أولي ناعم عند أول نقرة في الصفحة إذا لم يكن الصوت قيد التشغيل
-    const autoPlayOnFirstTouch = function() {
-        if (!isAudioPlaying && audio) {
-            audio.play().then(() => {
-                isAudioPlaying = true;
-                updateAudioButtonUI(true);
-            }).catch(() => {});
-        }
-        document.removeEventListener('click', autoPlayOnFirstTouch);
-    };
-    document.addEventListener('click', autoPlayOnFirstTouch, { once: true });
 }
 
 function toggleAudioPlayback() {
@@ -132,7 +218,7 @@ function toggleAudioPlayback() {
         audio.play().then(() => {
             isAudioPlaying = true;
             updateAudioButtonUI(true);
-            showToast('تم تشغيل الأنغام البحرية المصاحبة');
+            showToast('تم تشغيل صوت أمواج البحر والأنغام');
         }).catch(err => {
             console.error('Audio play error:', err);
         });
@@ -153,7 +239,7 @@ function updateAudioButtonUI(playing) {
 }
 
 // ==========================================================================
-// العدادات التنازلية الثلاثية (Three Countdown Units)
+// 3. العدادات التنازلية الثلاثية (Three Countdown Units)
 // ==========================================================================
 function initCountdown() {
     const targetDate = new Date(weddingData.weddingDateISO || '2026-10-15T19:30:00').getTime();
@@ -191,7 +277,7 @@ function initCountdown() {
 }
 
 // ==========================================================================
-// مسار برنامج الحفل (Event Itinerary Timeline)
+// 4. مسار برنامج الحفل (Event Itinerary Timeline)
 // ==========================================================================
 function renderItinerary() {
     const container = document.getElementById('itinerary-timeline-container');
@@ -211,7 +297,7 @@ function renderItinerary() {
         const itemEl = document.createElement('div');
         itemEl.className = 'timeline-item';
 
-        const iconClass = iconMap[item.icon] || 'fa-star';
+        const iconClass = iconMap[item.icon] || 'fa-water';
 
         itemEl.innerHTML = `
             <div class="timeline-badge"><i class="fas ${iconClass}"></i></div>
@@ -227,7 +313,7 @@ function renderItinerary() {
 }
 
 // ==========================================================================
-// معرض الذكريات بنمط التخطيط المتعرج المتداخل (Overlapping Zig-Zag Layout)
+// 5. معرض الذكريات بنمط التخطيط المتعرج المتداخل (Overlapping Zig-Zag)
 // ==========================================================================
 function initMemoriesGallery() {
     const container = document.getElementById('zigzag-gallery-container');
@@ -238,7 +324,7 @@ function initMemoriesGallery() {
 
     container.innerHTML = '';
 
-    weddingData.memories.forEach((mem, index) => {
+    weddingData.memories.forEach(mem => {
         const item = document.createElement('div');
         item.className = 'zigzag-item';
 
@@ -250,7 +336,7 @@ function initMemoriesGallery() {
                 </div>
             </div>
             <div class="zigzag-card-info">
-                <span class="zigzag-tag">${escapeHtml(mem.tag || 'ذكرى خاصة')}</span>
+                <span class="zigzag-tag">${escapeHtml(mem.tag || 'لحظات شاطئية')}</span>
                 <h3 class="zigzag-title">${escapeHtml(mem.title)}</h3>
                 <div class="zigzag-date"><i class="far fa-calendar-alt"></i> ${escapeHtml(mem.date)}</div>
                 <p class="zigzag-desc">${escapeHtml(mem.caption)}</p>
@@ -282,7 +368,6 @@ function initMemoriesGallery() {
         });
     }
 
-    // إعداد اللايت بوكس
     initLightboxModal();
 }
 
@@ -328,13 +413,12 @@ function closeLightbox() {
 }
 
 // ==========================================================================
-// تأكيد الحضور وحائط التهاني (RSVP & Wall of Wishes)
+// 6. تأكيد الحضور وحائط الأمنيات (RSVP & Wall of Wishes)
 // ==========================================================================
 function initRSVPAndWishes() {
     const form = document.getElementById('wedding-rsvp-form');
     if (!form) return;
 
-    // إظهار/إخفاء حقل المرافقين بناءً على خيار الحضور
     const radioOptions = form.querySelectorAll('input[name="attendance_status"]');
     const companionsGroup = document.getElementById('companions-form-group');
 
@@ -368,8 +452,8 @@ function initRSVPAndWishes() {
         const phone = phoneInput ? phoneInput.value.trim() : '';
         const notes = notesInput ? notesInput.value.trim() : '';
 
-        // حفظ الرد في قاعدة البيانات المحلية
-        const newEntry = window.WeddingStorage.addRSVP({
+        // حفظ الرد محلياً
+        window.WeddingStorage.addRSVP({
             name: guestName,
             phone: phone,
             status: status,
@@ -377,7 +461,7 @@ function initRSVPAndWishes() {
             notes: notes
         });
 
-        // إطلاق احتفالية القلوب والنجوم المبهجة
+        // مؤثرات احتفالية بلآلئ البحر والذهب
         triggerConfettiCelebration();
 
         // تحديث حائط الأمنيات فوراً
@@ -390,11 +474,10 @@ function initRSVPAndWishes() {
             const msgEl = document.getElementById('success-modal-message');
             if (msgEl) {
                 msgEl.innerHTML = isAttending
-                    ? `أهلاً وسهلاً بك <strong>${escapeHtml(guestName)}</strong>! تسعدنا وتشرفنا مشاركتكم لنا فرحة العمر.`
+                    ? `أهلاً وسهلاً بك <strong>${escapeHtml(guestName)}</strong>! تسعدنا وتشرفنا مشاركتكم لنا فرحة العمر على شاطئ البحر.`
                     : `شكراً لك <strong>${escapeHtml(guestName)}</strong> على لطفك ومشاركتنا التهنئة، قلوبكم معنا دائماً.`;
             }
 
-            // إعداد رابط الواتساب الجاهز للإرسال
             const btnWhatsapp = document.getElementById('btn-send-whatsapp-confirm');
             if (btnWhatsapp) {
                 const targetPhone = (weddingData.whatsappNumber || '+963933112233').replace(/\D/g, '');
@@ -414,7 +497,6 @@ function initRSVPAndWishes() {
         showToast('تم تسجيل ردكم الكريم بنجاح، دمتم ودامت أفراحكم!');
     });
 
-    // إغلاق مودال النجاح
     const btnCloseSuccess = document.getElementById('btn-close-success-modal');
     if (btnCloseSuccess) {
         btnCloseSuccess.addEventListener('click', function() {
@@ -424,7 +506,6 @@ function initRSVPAndWishes() {
     }
 }
 
-// عرض حائط الأمنيات المباشر
 function renderWishesWall() {
     const container = document.getElementById('wishes-wall-grid');
     if (!container) return;
@@ -442,7 +523,7 @@ function renderWishesWall() {
         card.className = 'wish-card';
         card.innerHTML = `
             <div class="wish-card-header">
-                <span class="wish-author"><i class="fas fa-heart" style="color:var(--gold-light); font-size:0.8rem; margin-left:6px;"></i> ${escapeHtml(item.name)}</span>
+                <span class="wish-author"><i class="fas fa-heart" style="color:var(--color-seafoam-bright); font-size:0.85rem; margin-left:6px;"></i> ${escapeHtml(item.name)}</span>
                 <span class="wish-time">${escapeHtml(item.date || 'مؤخراً')}</span>
             </div>
             <p class="wish-body">${escapeHtml(item.message)}</p>
@@ -453,10 +534,9 @@ function renderWishesWall() {
 window.renderWishesWall = renderWishesWall;
 
 // ==========================================================================
-// التكامل مع التقويم والمشاركة وخرائط جوجل (Calendar, Share & Maps)
+// 7. التقويم والمشاركة وخرائط جوجل (Calendar, Share & Maps)
 // ==========================================================================
 function initCalendarAndShare() {
-    // زر خرائط جوجل
     const btnMap = document.getElementById('btn-open-map');
     if (btnMap) {
         btnMap.addEventListener('click', function(e) {
@@ -466,7 +546,6 @@ function initCalendarAndShare() {
         });
     }
 
-    // زر إضافة التقويم
     const btnCalendar = document.getElementById('btn-add-calendar');
     if (btnCalendar) {
         btnCalendar.addEventListener('click', function(e) {
@@ -475,7 +554,6 @@ function initCalendarAndShare() {
         });
     }
 
-    // زر مشاركة الدعوة
     const btnShare = document.getElementById('btn-share-invite');
     if (btnShare) {
         btnShare.addEventListener('click', function() {
@@ -484,14 +562,12 @@ function initCalendarAndShare() {
     }
 }
 
-// توليد وتحميل ملف التقويم (.ics)
 function downloadICalendarFile() {
     const title = `حفل زفاف محمد وحنين المبارك`;
     const description = `نتشرف بحضوركم لمشاركتنا فرحة العمر في ${weddingData.venueName} - ${weddingData.venueAddress}`;
     const location = `${weddingData.venueName}, ${weddingData.venueCity}`;
 
-    // صيغة التاريخ لملف iCal
-    const startDate = '20261015T163000Z'; // 19:30 Damascus time (UTC+3)
+    const startDate = '20261015T163000Z'; // 19:30 Damascus time
     const endDate = '20261015T223000Z';
 
     const icsData = [
@@ -522,10 +598,9 @@ function downloadICalendarFile() {
     showToast('تم تنزيل موعد الحفل لحفظه في تقويم هاتفك بنجاح');
 }
 
-// مشاركة رابط الدعوة عبر تطبيقات التواصل
 function shareInvitation() {
     const shareTitle = `دعوة لحضور حفل زفاف محمد وحنين`;
-    const shareText = `يتشرف كلٌّ من والد العريس ووالد العروس بدعوتكم الكريمة لحضور حفل زفاف نجليهما محمد وحنين في اللاذقية. يسعدنا اطلاعكم على تفاصيل الدعوة وتأكيد الحضور:`;
+    const shareText = `يتشرف كلٌّ من والد العريس ووالد العروس بدعوتكم الكريمة لحضور حفل زفاف نجليهما محمد وحنين على شاطئ البحر في اللاذقية. يسعدنا اطلاعكم على بطاقة الدعوة وتأكيد الحضور:`;
     const shareUrl = window.location.href.split('#')[0];
 
     if (navigator.share) {
@@ -535,7 +610,6 @@ function shareInvitation() {
             url: shareUrl
         }).catch(() => {});
     } else {
-        // نسخ الرابط للحافظة
         navigator.clipboard.writeText(`${shareText}\n${shareUrl}`).then(() => {
             showToast('تم نسخ رابط الدعوة بنجاح، يمكنك مشاركته مع الأحباب');
         }).catch(() => {
@@ -545,14 +619,16 @@ function shareInvitation() {
 }
 
 // ==========================================================================
-// التوجيه ومراقبة مسار الإدارة (#admin)
+// 8. التوجيه ومراقبة مسار الإدارة (#admin)
 // ==========================================================================
 function initRouting() {
     function checkHashRoute() {
         const hash = window.location.hash;
         const adminView = document.getElementById('admin-view');
+        const introScreen = document.getElementById('intro-screen');
 
         if (hash === '#admin') {
+            if (introScreen) introScreen.classList.add('hidden');
             if (adminView) {
                 adminView.style.display = 'block';
                 if (window.initAdmin) window.initAdmin();
@@ -568,53 +644,31 @@ function initRouting() {
     checkHashRoute();
 }
 
-// ==========================================================================
-// المؤثرات البصرية ورسائل التنبيه (Visual Effects & Toasts)
-// ==========================================================================
-function createSparkles() {
-    const container = document.getElementById('sparkles-container');
-    if (!container) return;
-
-    const sparkleCount = 20;
-    for (let i = 0; i < sparkleCount; i++) {
-        const sparkle = document.createElement('div');
-        sparkle.className = 'sparkle';
-        const size = Math.random() * 4 + 2;
-        sparkle.style.width = `${size}px`;
-        sparkle.style.height = `${size}px`;
-        sparkle.style.left = `${Math.random() * 100}%`;
-        sparkle.style.top = `${Math.random() * 100}%`;
-        sparkle.style.animationDuration = `${Math.random() * 8 + 6}s`;
-        sparkle.style.animationDelay = `${Math.random() * 5}s`;
-        container.appendChild(sparkle);
-    }
-}
-
+// احتفالية لآلئ البحر والذهب
 function triggerConfettiCelebration() {
-    // رسم احتفالية قلوب ولمعان ذهبي خفيف
-    for (let i = 0; i < 35; i++) {
+    for (let i = 0; i < 40; i++) {
         createFloatingConfettiPiece();
     }
 }
 
 function createFloatingConfettiPiece() {
     const piece = document.createElement('div');
-    const colors = ['#fce494', '#d4af37', '#64dfdf', '#ffffff', '#e2be52'];
+    const colors = ['#2dd4bf', '#06b6d4', '#99f6e4', '#ffffff', '#fde047', '#38bdf8'];
     const color = colors[Math.floor(Math.random() * colors.length)];
-    const size = Math.random() * 8 + 6;
+    const size = Math.random() * 9 + 5;
 
     piece.style.position = 'fixed';
-    piece.style.zIndex = '99999';
+    piece.style.zIndex = '999999';
     piece.style.top = '50%';
     piece.style.left = '50%';
     piece.style.width = `${size}px`;
     piece.style.height = `${size}px`;
     piece.style.backgroundColor = color;
-    piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+    piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '3px';
     piece.style.pointerEvents = 'none';
 
-    const destX = (Math.random() - 0.5) * window.innerWidth * 0.8;
-    const destY = (Math.random() - 0.5) * window.innerHeight * 0.8;
+    const destX = (Math.random() - 0.5) * window.innerWidth * 0.85;
+    const destY = (Math.random() - 0.5) * window.innerHeight * 0.85;
 
     document.body.appendChild(piece);
 
@@ -622,7 +676,7 @@ function createFloatingConfettiPiece() {
         { transform: 'translate(0, 0) scale(1)', opacity: 1 },
         { transform: `translate(${destX}px, ${destY}px) rotate(${Math.random() * 360}deg) scale(0)`, opacity: 0 }
     ], {
-        duration: 1800,
+        duration: 2000,
         easing: 'cubic-bezier(0.25, 1, 0.5, 1)'
     }).onfinish = () => {
         piece.remove();
@@ -635,7 +689,7 @@ function showToast(message) {
 
     const toast = document.createElement('div');
     toast.className = 'toast';
-    toast.innerHTML = `<i class="fas fa-check-circle" style="color:var(--gold-light)"></i> <span>${escapeHtml(message)}</span>`;
+    toast.innerHTML = `<i class="fas fa-water" style="color:var(--color-seafoam-bright)"></i> <span>${escapeHtml(message)}</span>`;
 
     container.appendChild(toast);
 
