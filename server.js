@@ -13,6 +13,7 @@ const MIME_TYPES = {
     '.mp4': 'video/mp4',
     '.mp3': 'audio/mpeg',
     '.m4a': 'audio/mp4',
+    '.wav': 'audio/wav',
     '.jpg': 'image/jpeg',
     '.jpeg': 'image/jpeg',
     '.png': 'image/png',

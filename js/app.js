@@ -1,8 +1,136 @@
 /**
- * السكربت الرئيسي لتشغيل وتفاعل موقع دعوة زفاف محمد وحنين
- * ثيم أمواج البحر الفيروزية الصافية والإنترو السينمائي الكامل
- * Main Application Logic - Royal Ocean Wedding Platform
+ * محرك المؤثرات الصوتية الكريستالية الفاخرة (Web Audio API Crystal Chimes Synthesizer)
+ * يولد رنات بلورية نقية خالية من أي تأخير استجابة ومناسبة لكافة أجهزة الهاتف
  */
+const AudioEngine = {
+    ctx: null,
+    init() {
+        if (!this.ctx) {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            if (AudioContext) {
+                this.ctx = new AudioContext();
+            }
+        }
+        if (this.ctx && this.ctx.state === 'suspended') {
+            this.ctx.resume();
+        }
+    },
+    // توليد نغمة جرس كريستالي نقي مع اضمحلال ناعم
+    playChime(freq, timeOffset = 0, duration = 1.2, gainLevel = 0.22) {
+        try {
+            this.init();
+            if (!this.ctx) return;
+            const now = this.ctx.currentTime + timeOffset;
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, now);
+
+            // تدرج تنازلي أسي يعطي صدى الرنين الزجاجي الكريستالي
+            gain.gain.setValueAtTime(gainLevel, now);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+
+            osc.start(now);
+            osc.stop(now + duration);
+        } catch (e) {
+            console.warn('Audio chime warning:', e);
+        }
+    },
+    // لحن كورد الفتح الملكي عند فتح بطاقة الدعوة (C6 -> E6 -> G6 -> C7)
+    playOpenChord() {
+        this.playChime(1046.50, 0.0, 1.8, 0.22); // C6
+        this.playChime(1318.51, 0.12, 1.8, 0.20); // E6
+        this.playChime(1567.98, 0.24, 2.0, 0.22); // G6
+        this.playChime(2093.00, 0.38, 2.5, 0.25); // C7
+    },
+    // نقرة كريستالية خفيفة للأزرار وعناصر التحكم
+    playTap() {
+        this.playChime(1318.51, 0.0, 0.5, 0.12);
+        this.playChime(1760.00, 0.05, 0.7, 0.14);
+    },
+    // كورد الاحتفال الذهبي عند تأكيد الحضور أو كتابة تهنئة
+    playCelebrationChord() {
+        this.playChime(880.00, 0.0, 2.0, 0.18);   // A5
+        this.playChime(1108.73, 0.1, 2.0, 0.20);  // C#6
+        this.playChime(1318.51, 0.2, 2.2, 0.22);  // E6
+        this.playChime(1760.00, 0.32, 2.5, 0.25); // A6
+        this.playChime(2217.46, 0.46, 2.8, 0.22); // C#7
+    },
+    // تخليق هدير أمواج البحر الطبيعي إجرائياً بنقاء فائق وبدون استهلاك للبيانات
+    oceanNode: null,
+    oceanGain: null,
+    startOceanWaves() {
+        try {
+            this.init();
+            if (!this.ctx || this.oceanNode) return;
+
+            const bufferSize = this.ctx.sampleRate * 4;
+            const buffer = this.ctx.createBuffer(2, bufferSize, this.ctx.sampleRate);
+            const left = buffer.getChannelData(0);
+            const right = buffer.getChannelData(1);
+
+            let b0_l = 0, b1_l = 0;
+            let b0_r = 0, b1_r = 0;
+
+            for (let i = 0; i < bufferSize; i++) {
+                const white_l = Math.random() * 2 - 1;
+                const white_r = Math.random() * 2 - 1;
+                b0_l = 0.96 * b0_l + 0.04 * white_l;
+                b1_l = 0.96 * b1_l + 0.04 * b0_l;
+                left[i] = b1_l * 0.4;
+
+                b0_r = 0.96 * b0_r + 0.04 * white_r;
+                b1_r = 0.96 * b1_r + 0.04 * b0_r;
+                right[i] = b1_r * 0.4;
+            }
+
+            this.oceanNode = this.ctx.createBufferSource();
+            this.oceanNode.buffer = buffer;
+            this.oceanNode.loop = true;
+
+            const filter = this.ctx.createBiquadFilter();
+            filter.type = 'lowpass';
+            filter.frequency.setValueAtTime(420, this.ctx.currentTime);
+
+            this.oceanGain = this.ctx.createGain();
+            this.oceanGain.gain.setValueAtTime(0.24, this.ctx.currentTime);
+
+            const lfo = this.ctx.createOscillator();
+            const lfoGain = this.ctx.createGain();
+            lfo.frequency.setValueAtTime(0.18, this.ctx.currentTime);
+            lfoGain.gain.setValueAtTime(0.12, this.ctx.currentTime);
+
+            lfo.connect(lfoGain);
+            lfoGain.connect(this.oceanGain.gain);
+            lfo.start();
+
+            this.oceanNode.connect(filter);
+            filter.connect(this.oceanGain);
+            this.oceanGain.connect(this.ctx.destination);
+
+            this.oceanNode.start();
+        } catch (e) {
+            console.warn('Ocean waves synth error:', e);
+        }
+    },
+    stopOceanWaves() {
+        if (this.oceanGain && this.ctx) {
+            try {
+                this.oceanGain.gain.setValueAtTime(0, this.ctx.currentTime);
+                if (this.oceanNode) {
+                    this.oceanNode.stop();
+                    this.oceanNode.disconnect();
+                    this.oceanNode = null;
+                }
+            } catch (e) {}
+        }
+    }
+};
+window.AudioEngine = AudioEngine;
 
 document.addEventListener('DOMContentLoaded', function() {
     // 1. تهيئة البيانات والتطبيق
@@ -11,22 +139,25 @@ document.addEventListener('DOMContentLoaded', function() {
     // 2. التحكم بشاشة الإنترو السينمائية وانتقال أمواج البحر
     initOceanVideoIntro();
 
-    // 3. التحكم بالصوت والموسيقى البحرية
+    // 3. تهيئة محرك فيديو الخلفية الحية المستمرة لكامل الموقع
+    initLivingVideoBackground();
+
+    // 4. التحكم بالصوت والموسيقى المزدوجة البحرية
     initMediaControls();
 
-    // 4. العدادات التنازلية الثلاثية (أيام، ساعات، دقائق)
+    // 5. العدادات التنازلية الثلاثية (أيام، ساعات، دقائق)
     initCountdown();
 
-    // 5. معرض الذكريات واللايت بوكس (Overlapping Zig-Zag Layout)
+    // 6. معرض الذكريات واللايت بوكس (Overlapping Zig-Zag Layout)
     initMemoriesGallery();
 
-    // 6. نموذج تأكيد الحضور وحائط الأمنيات المباشر
+    // 7. نموذج تأكيد الحضور وحائط الأمنيات المباشر
     initRSVPAndWishes();
 
-    // 7. التكامل مع التقويم والمشاركة وخرائط جوجل
+    // 8. التكامل مع التقويم والمشاركة وخرائط جوجل
     initCalendarAndShare();
 
-    // 8. توجيه ومراقبة مسار الإدارة (#admin)
+    // 9. توجيه ومراقبة مسار الإدارة (#admin)
     initRouting();
 });
 
@@ -142,21 +273,20 @@ function initOceanVideoIntro() {
 
     // دالة الانتقال الساحر من الإنترو إلى بطاقة الدعوة بواسطة تموج البحر
     function openInvitation() {
+        // 1. عزف كورد الفتح الكريستالي الملكي الفاخر
+        AudioEngine.playOpenChord();
+
+        // 2. تشغيل فيديو الخلفية الحية المستمرة لكامل الموقع
+        ensureLivingVideoPlaying();
+
+        // 3. تشغيل نظام الصوت المزدوج (المقطوعة الرومانسية + أمواج البحر)
+        playDualAudio();
+
         if (curtain) {
             curtain.classList.add('active');
             setTimeout(() => {
                 introScreen.classList.add('hidden');
                 video.pause();
-
-                // تشغيل صوت أمواج البحر في الخلفية بعد فتح الدعوة
-                const bgAudio = document.getElementById('bg-audio');
-                if (bgAudio) {
-                    bgAudio.currentTime = 0;
-                    bgAudio.play().then(() => {
-                        isAudioPlaying = true;
-                        updateAudioButtonUI(true);
-                    }).catch(() => {});
-                }
 
                 setTimeout(() => {
                     curtain.classList.add('sweep-out');
@@ -187,6 +317,7 @@ function initOceanVideoIntro() {
     // زر إعادة مشاهدة الإنترو في أي وقت
     if (btnReplay) {
         btnReplay.addEventListener('click', function() {
+            AudioEngine.playTap();
             introScreen.classList.remove('hidden');
             video.currentTime = 0;
             video.play().catch(() => {});
@@ -197,9 +328,80 @@ function initOceanVideoIntro() {
 }
 
 // ==========================================================================
-// 2. التحكم بالصوت والموسيقى وإدارة دورة حياة الصوت عند الخروج
+// 2. محرك فيديو الخلفية الحية المستمرة (Living Video Background Engine)
+// ==========================================================================
+function initLivingVideoBackground() {
+    const siteVideo = document.getElementById('site-ambient-video');
+    const overlay = document.getElementById('ambient-video-overlay');
+    if (!siteVideo) return;
+
+    siteVideo.muted = true;
+    siteVideo.play().catch(() => {
+        console.log('Ambient site video waiting for interaction');
+    });
+
+    // مراقبة الأقسام وتغيير السمة اللونية والإضاءة تلقائياً مع التمرير
+    const sections = [
+        { id: 'hero-section', theme: 'theme-hero' },
+        { id: 'countdown-section', theme: 'theme-hero' },
+        { id: 'itinerary-section', theme: 'theme-itinerary' },
+        { id: 'gallery-section', theme: 'theme-gallery' },
+        { id: 'venue-section', theme: 'theme-venue' },
+        { id: 'rsvp-section', theme: 'theme-rsvp' }
+    ];
+
+    if ('IntersectionObserver' in window && overlay) {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting && entry.intersectionRatio >= 0.2) {
+                    const match = sections.find(s => s.id === entry.target.id);
+                    if (match) {
+                        overlay.className = 'ambient-video-overlay ' + match.theme;
+                    }
+                }
+            });
+        }, { threshold: [0.2, 0.45] });
+
+        sections.forEach(s => {
+            const el = document.getElementById(s.id);
+            if (el) observer.observe(el);
+        });
+    }
+}
+
+function ensureLivingVideoPlaying() {
+    const siteVideo = document.getElementById('site-ambient-video');
+    if (siteVideo && siteVideo.paused) {
+        siteVideo.muted = true;
+        siteVideo.play().catch(() => {});
+    }
+}
+
+// ==========================================================================
+// 3. نظام الصوت المزدوج والتحكم بدورة حياة الصوت عند الخروج
 // ==========================================================================
 let wasAudioPlayingBeforeHide = false;
+
+function playDualAudio() {
+    const bgAudio = document.getElementById('bg-audio');
+
+    if (bgAudio) {
+        bgAudio.volume = 0.75;
+        bgAudio.play().then(() => {
+            isAudioPlaying = true;
+            updateAudioButtonUI(true);
+        }).catch(() => {});
+    }
+    AudioEngine.startOceanWaves();
+}
+
+function pauseDualAudio() {
+    const bgAudio = document.getElementById('bg-audio');
+    if (bgAudio) bgAudio.pause();
+    AudioEngine.stopOceanWaves();
+    isAudioPlaying = false;
+    updateAudioButtonUI(false);
+}
 
 function initMediaControls() {
     const audioBtn = document.getElementById('btn-toggle-audio');
@@ -217,71 +419,62 @@ function initMediaControls() {
 function initAudioLifecycle() {
     const audio = document.getElementById('bg-audio');
     const video = document.getElementById('intro-video-player');
+    const siteVideo = document.getElementById('site-ambient-video');
 
     // 1. مراقبة مغادرة الصفحة أو تصغير المتصفح أو إقفال الشاشة (Page Visibility API)
     document.addEventListener('visibilitychange', function() {
         if (document.hidden) {
             // المستخدم خرج من المتصفح أو بدل التطبيق: إيقاف الصوت فوراً وبشكل حاسم
-            if (audio && !audio.paused) {
+            if (isAudioPlaying) {
                 wasAudioPlayingBeforeHide = true;
-                audio.pause();
-                updateAudioButtonUI(false);
+                pauseDualAudio();
             } else {
                 wasAudioPlayingBeforeHide = false;
             }
-            if (video && !video.paused) {
-                video.pause();
-            }
+            if (video && !video.paused) video.pause();
+            if (siteVideo && !siteVideo.paused) siteVideo.pause();
         } else {
             // عودة المستخدم للمتصفح: استئناف تشغيل الصوت إذا كان يعمل قبل المغادرة
-            if (wasAudioPlayingBeforeHide && audio) {
-                audio.play().then(() => {
-                    isAudioPlaying = true;
-                    updateAudioButtonUI(true);
-                }).catch(() => {});
+            if (wasAudioPlayingBeforeHide) {
+                playDualAudio();
+            }
+            if (siteVideo && siteVideo.paused) {
+                siteVideo.play().catch(() => {});
             }
         }
     });
 
     // 2. حدث مغادرة الصفحة كلياً أو إغلاق التبويب على الهواتف (pagehide)
     window.addEventListener('pagehide', function() {
-        if (audio) audio.pause();
+        pauseDualAudio();
         if (video) video.pause();
+        if (siteVideo) siteVideo.pause();
     });
 
     // 3. حدث قبل تفريغ الصفحة (beforeunload)
     window.addEventListener('beforeunload', function() {
-        if (audio) audio.pause();
+        pauseDualAudio();
         if (video) video.pause();
+        if (siteVideo) siteVideo.pause();
     });
 
-    // 4. حدث فقدان التركيز على النافذة (blur) على متصفحات الهواتف وتطبيقات المراسلة
+    // 4. حدث فقدان التركيز على النافذة (blur) على متصفحات الهواتف
     window.addEventListener('blur', function() {
-        if (document.hidden && audio && !audio.paused) {
+        if (document.hidden && isAudioPlaying) {
             wasAudioPlayingBeforeHide = true;
-            audio.pause();
-            updateAudioButtonUI(false);
+            pauseDualAudio();
         }
     });
 }
 
 function toggleAudioPlayback() {
-    const audio = document.getElementById('bg-audio');
-    if (!audio) return;
-
+    AudioEngine.playTap();
     if (isAudioPlaying) {
-        audio.pause();
-        isAudioPlaying = false;
-        updateAudioButtonUI(false);
+        pauseDualAudio();
         showToast('تم كتم الصوت');
     } else {
-        audio.play().then(() => {
-            isAudioPlaying = true;
-            updateAudioButtonUI(true);
-            showToast('تم تشغيل صوت أمواج البحر والأنغام');
-        }).catch(err => {
-            console.error('Audio play error:', err);
-        });
+        playDualAudio();
+        showToast('تم تشغيل صوت أمواج البحر والأنغام الملكية');
     }
 }
 
@@ -409,6 +602,7 @@ function initMemoriesGallery() {
     // ربط ميزة اللايت بوكس لتكبير الصور
     container.querySelectorAll('.zigzag-image-wrapper').forEach(wrap => {
         wrap.addEventListener('click', function() {
+            AudioEngine.playTap();
             const imgSrc = this.getAttribute('data-img');
             openLightbox(imgSrc);
         });
@@ -417,6 +611,7 @@ function initMemoriesGallery() {
     // زر إظهار / إخفاء المعرض الاختياري
     if (toggleBtn && gallerySection) {
         toggleBtn.addEventListener('click', function() {
+            AudioEngine.playTap();
             const isHidden = gallerySection.style.display === 'none';
             if (isHidden) {
                 gallerySection.style.display = 'block';
@@ -521,6 +716,9 @@ function initRSVPAndWishes() {
             notes: notes
         });
 
+        // عزف كورد الاحتفال الكريستالي الملكي الفاخر
+        AudioEngine.playCelebrationChord();
+
         // مؤثرات احتفالية بلآلئ البحر والذهب
         triggerConfettiCelebration();
 
@@ -610,6 +808,7 @@ function initCalendarAndShare() {
     if (btnCalendar) {
         btnCalendar.addEventListener('click', function(e) {
             e.preventDefault();
+            AudioEngine.playTap();
             downloadICalendarFile();
         });
     }
@@ -617,6 +816,7 @@ function initCalendarAndShare() {
     const btnShare = document.getElementById('btn-share-invite');
     if (btnShare) {
         btnShare.addEventListener('click', function() {
+            AudioEngine.playTap();
             shareInvitation();
         });
     }

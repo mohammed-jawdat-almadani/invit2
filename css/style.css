@@ -71,21 +71,78 @@ html {
 
 body {
     font-family: var(--font-body);
-    background-color: var(--color-ocean-deep);
+    background-color: #021220;
     color: var(--text-primary);
     overflow-x: hidden;
     line-height: 1.7;
     min-height: 100vh;
     position: relative;
-    /* خلفية أمواج البحر الفائقة الدقة المقتبسة مباشرة من إطارات الفيديو */
-    background-image: 
-        radial-gradient(circle at 50% 20%, rgba(6, 182, 212, 0.25) 0%, transparent 60%),
-        linear-gradient(to bottom, rgba(6, 35, 61, 0.72), rgba(3, 18, 33, 0.88)),
-        url('../assets/images/ocean_hero_bg.jpg');
-    background-size: cover;
-    background-position: center top;
-    background-attachment: fixed;
-    background-repeat: no-repeat;
+    /* خلفية شفافة تتيح لفيديو أمواج البحر الحي أن ينساب خلف كامل عناصر وصفحات الموقع */
+    background: transparent;
+}
+
+/* ==========================================================================
+   طبقة فيديو الخلفية الحية المستمرة لكامل الموقع (Living Ambient Video Background Engine)
+   ========================================================================== */
+.fixed-video-background-layer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.ambient-video-player {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scale(1.05);
+    filter: brightness(0.82) contrast(1.15) saturate(1.25);
+    transition: filter 1.2s cubic-bezier(0.4, 0, 0.2, 1), transform 1.2s ease;
+}
+
+.ambient-video-overlay {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 25%, rgba(6, 35, 61, 0.45) 0%, rgba(2, 18, 32, 0.88) 100%);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    transition: background 1.2s ease, opacity 1.2s ease;
+    z-index: 1;
+}
+
+/* سمات الإضاءة السينمائية المتكيفة هجيناً مع أقسام الموقع */
+.ambient-video-overlay.theme-hero {
+    background: radial-gradient(circle at 50% 25%, rgba(6, 35, 61, 0.42) 0%, rgba(2, 18, 32, 0.86) 100%);
+}
+.ambient-video-overlay.theme-itinerary {
+    background: radial-gradient(circle at 50% 30%, rgba(14, 116, 144, 0.38) 0%, rgba(2, 18, 32, 0.89) 100%);
+}
+.ambient-video-overlay.theme-gallery {
+    background: radial-gradient(circle at 50% 35%, rgba(180, 83, 9, 0.25) 0%, rgba(2, 18, 32, 0.9) 100%);
+}
+.ambient-video-overlay.theme-venue {
+    background: radial-gradient(circle at 50% 30%, rgba(3, 105, 161, 0.38) 0%, rgba(1, 14, 26, 0.92) 100%);
+}
+.ambient-video-overlay.theme-rsvp {
+    background: radial-gradient(circle at 50% 30%, rgba(30, 58, 138, 0.36) 0%, rgba(2, 12, 22, 0.93) 100%);
+}
+
+.ambient-caustics-layer {
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle at 25% 20%, rgba(255, 255, 255, 0.08) 0%, transparent 40%),
+                      radial-gradient(circle at 80% 65%, rgba(45, 212, 191, 0.09) 0%, transparent 50%);
+    z-index: 2;
+    animation: oceanCausticsPulse 8s ease-in-out infinite alternate;
+}
+
+@keyframes oceanCausticsPulse {
+    0% { opacity: 0.4; transform: scale(1); }
+    100% { opacity: 0.85; transform: scale(1.05); }
 }
 
 /* ==========================================================================
@@ -232,111 +289,122 @@ body {
 }
 
 /* ==========================================================================
-   الزخرفة والمونوغرام الملكي الفاخر (Royal Crest Monogram Styles)
+   الزخرفة والمونوغرام الملكي الذهبي الفاخر (Extracted Royal Crest Ornament)
    ========================================================================== */
-.royal-monogram-crest {
+.royal-crest-ornament-wrap {
     position: relative;
-    width: 200px;
-    height: 200px;
-    margin: 0 auto 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: inline-block;
+    margin: 0 auto 16px auto;
+    filter: drop-shadow(0 10px 25px rgba(0, 0, 0, 0.75)) drop-shadow(0 0 35px rgba(212, 175, 55, 0.45));
+    animation: crestFloating 4s ease-in-out infinite alternate;
+}
+
+@keyframes crestFloating {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(-8px); }
+}
+
+.royal-crest-img {
+    display: block;
+    max-width: 220px;
+    height: auto;
+    object-fit: contain;
+    position: relative;
+    z-index: 2;
     user-select: none;
+    -webkit-user-drag: none;
 }
 
-.intro-crest {
-    width: 195px;
-    height: 195px;
-    margin: 2px auto 14px;
+.intro-crest-img {
+    max-width: 205px;
 }
 
-.hero-crest {
-    width: 220px;
-    height: 220px;
-    margin: 18px auto 22px;
+.hero-crest-img {
+    max-width: 225px;
 }
 
-.crest-svg {
+.crest-glow-aura {
+    position: absolute;
+    inset: -14%;
+    background: radial-gradient(circle, rgba(212, 175, 55, 0.38) 0%, rgba(45, 212, 191, 0.22) 45%, transparent 72%);
+    border-radius: 50%;
+    filter: blur(18px);
+    z-index: 1;
+    pointer-events: none;
+    animation: pulseAura 3.5s ease-in-out infinite alternate;
+}
+
+@keyframes pulseAura {
+    0% { transform: scale(0.92); opacity: 0.6; }
+    100% { transform: scale(1.1); opacity: 1; }
+}
+
+.crest-light-sweep {
     position: absolute;
     inset: 0;
-    width: 100%;
-    height: 100%;
-    filter: drop-shadow(0 6px 20px rgba(0, 0, 0, 0.55));
+    z-index: 3;
     pointer-events: none;
-    z-index: 1;
+    -webkit-mask-image: url('../assets/images/royal_crest_monogram_gold.png');
+    mask-image: url('../assets/images/royal_crest_monogram_gold.png');
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    background: linear-gradient(105deg, transparent 20%, rgba(255, 255, 255, 0.75) 45%, rgba(254, 240, 138, 0.85) 52%, transparent 62%);
+    background-size: 250% 100%;
+    background-position: 150% 0;
+    animation: luxuryShimmerSweep 5s ease-in-out infinite;
 }
 
-.crest-inner-disc {
-    position: absolute;
-    top: 51.5%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 2;
-    width: 116px;
-    height: 116px;
-    border-radius: 50%;
-    background: radial-gradient(circle at 45% 35%, #0e7490 0%, #062b4d 65%, #031524 100%);
-    box-shadow: inset 0 0 16px rgba(0, 0, 0, 0.85), 0 0 25px rgba(45, 212, 191, 0.35);
-    border: 1px solid rgba(45, 212, 191, 0.55);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 6px;
-    box-sizing: border-box;
+@keyframes luxuryShimmerSweep {
+    0% { background-position: 150% 0; }
+    35% { background-position: -50% 0; }
+    100% { background-position: -50% 0; }
 }
 
-.crest-letters-en {
-    font-family: 'Cinzel Decorative', 'Playfair Display', serif;
-    font-size: 1.65rem;
-    font-weight: 700;
-    background: linear-gradient(135deg, #ffffff 0%, #fef08a 40%, #eab308 80%, #ca8a04 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    letter-spacing: 2px;
-    line-height: 1.1;
-    white-space: nowrap !important;
-    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+/* تنسيق اسمي العروسين وحروف المونوغرام بالإنترو */
+.intro-names-typography {
+    margin-bottom: 14px;
+}
+
+.intro-pre-title {
     display: block;
-    text-align: center;
-}
-
-.crest-divider {
-    font-size: 0.65rem;
-    color: var(--color-seafoam-bright);
-    margin: 2px 0 1px;
-    line-height: 1;
-    opacity: 0.9;
-    text-shadow: 0 0 8px var(--color-seafoam-bright);
-}
-
-.crest-letters-ar {
-    font-family: var(--font-verse);
+    font-family: 'Cinzel Decorative', 'Playfair Display', serif;
     font-size: 1.15rem;
     font-weight: 700;
-    color: var(--color-seafoam-light);
-    line-height: 1.1;
-    white-space: nowrap !important;
-    text-shadow: 0 0 8px rgba(45, 212, 191, 0.5);
-    display: block;
-    text-align: center;
+    letter-spacing: 5px;
+    color: #fef08a;
+    text-shadow: 0 0 14px rgba(254, 240, 138, 0.6);
+    margin-bottom: 6px;
 }
 
 .intro-title {
-    font-family: var(--font-heading);
-    font-size: 2.1rem;
+    font-family: 'Cinzel Decorative', 'Playfair Display', serif;
+    font-size: 1.95rem;
     font-weight: 800;
-    color: #fff;
-    margin-bottom: 8px;
-    text-shadow: 0 2px 15px rgba(0, 0, 0, 0.6);
+    letter-spacing: 2px;
+    background: linear-gradient(135deg, #ffffff 0%, #fef08a 40%, #eab308 80%, #ca8a04 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 4px;
+    text-shadow: 0 2px 15px rgba(0, 0, 0, 0.7);
+}
+
+.intro-arabic-names {
+    font-family: var(--font-heading);
+    font-size: 1.65rem;
+    font-weight: 800;
+    color: var(--color-seafoam-light);
+    text-shadow: 0 0 15px rgba(45, 212, 191, 0.65);
 }
 
 .intro-subtitle {
-    font-size: 1rem;
+    font-size: 1.05rem;
     color: var(--text-secondary);
     margin-bottom: 28px;
-    line-height: 1.7;
+    line-height: 1.8;
 }
 
 /* الزر التفاعلي الأكبر لفتح كرت الدعوة */
@@ -1652,6 +1720,14 @@ body {
 
     .hero-crest .crest-letters-en {
         font-size: 1.55rem;
+    }
+
+    .intro-crest-img {
+        max-width: 175px;
+    }
+
+    .hero-crest-img {
+        max-width: 185px;
     }
 
     .floating-actions {
