@@ -231,27 +231,94 @@ body {
     letter-spacing: 0.5px;
 }
 
-.intro-monogram-circle {
-    width: 90px;
-    height: 90px;
-    border-radius: 50%;
+/* ==========================================================================
+   الزخرفة والمونوغرام الملكي الفاخر (Royal Crest Monogram Styles)
+   ========================================================================== */
+.royal-monogram-crest {
+    position: relative;
+    width: 200px;
+    height: 200px;
     margin: 0 auto 16px;
-    background: radial-gradient(circle, #0e7490 0%, #06233d 100%);
-    border: 2px solid var(--color-seafoam-bright);
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 0 25px rgba(45, 212, 191, 0.4);
+    user-select: none;
 }
 
-.intro-monogram-text {
-    font-family: var(--font-monogram);
-    font-size: 1.8rem;
+.intro-crest {
+    width: 195px;
+    height: 195px;
+    margin: 2px auto 14px;
+}
+
+.hero-crest {
+    width: 220px;
+    height: 220px;
+    margin: 18px auto 22px;
+}
+
+.crest-svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    filter: drop-shadow(0 6px 20px rgba(0, 0, 0, 0.55));
+    pointer-events: none;
+    z-index: 1;
+}
+
+.crest-inner-disc {
+    position: relative;
+    z-index: 2;
+    width: 118px;
+    height: 118px;
+    border-radius: 50%;
+    margin-top: 8px; /* مطابقة مركز دائرة الـ SVG عند cy=124 */
+    background: radial-gradient(circle at 45% 35%, #0e7490 0%, #062b4d 65%, #031524 100%);
+    box-shadow: inset 0 0 16px rgba(0, 0, 0, 0.85), 0 0 25px rgba(45, 212, 191, 0.35);
+    border: 1px solid rgba(45, 212, 191, 0.55);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 6px;
+    box-sizing: border-box;
+}
+
+.crest-letters-en {
+    font-family: 'Cinzel Decorative', 'Playfair Display', serif;
+    font-size: 1.65rem;
     font-weight: 700;
-    background: var(--gold-text-gradient);
+    background: linear-gradient(135deg, #ffffff 0%, #fef08a 40%, #eab308 80%, #ca8a04 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     letter-spacing: 2px;
+    line-height: 1.1;
+    white-space: nowrap !important;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    display: block;
+    text-align: center;
+}
+
+.crest-divider {
+    font-size: 0.65rem;
+    color: var(--color-seafoam-bright);
+    margin: 2px 0 1px;
+    line-height: 1;
+    opacity: 0.9;
+    text-shadow: 0 0 8px var(--color-seafoam-bright);
+}
+
+.crest-letters-ar {
+    font-family: var(--font-verse);
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--color-seafoam-light);
+    line-height: 1.1;
+    white-space: nowrap !important;
+    text-shadow: 0 0 8px rgba(45, 212, 191, 0.5);
+    display: block;
+    text-align: center;
 }
 
 .intro-title {
@@ -1548,6 +1615,43 @@ body {
         padding: 16px 28px;
         width: 100%;
         justify-content: center;
+    }
+
+    .intro-crest {
+        width: 175px;
+        height: 175px;
+        margin: 2px auto 10px;
+    }
+
+    .intro-crest .crest-inner-disc {
+        width: 104px;
+        height: 104px;
+        margin-top: 7px;
+    }
+
+    .intro-crest .crest-letters-en {
+        font-size: 1.45rem;
+        letter-spacing: 1.5px;
+    }
+
+    .intro-crest .crest-letters-ar {
+        font-size: 1rem;
+    }
+
+    .hero-crest {
+        width: 195px;
+        height: 195px;
+        margin: 12px auto 18px;
+    }
+
+    .hero-crest .crest-inner-disc {
+        width: 114px;
+        height: 114px;
+        margin-top: 8px;
+    }
+
+    .hero-crest .crest-letters-en {
+        font-size: 1.55rem;
     }
 
     .floating-actions {

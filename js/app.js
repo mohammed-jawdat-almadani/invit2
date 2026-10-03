@@ -54,11 +54,16 @@ function applyWeddingData() {
     if (groomFamEl) groomFamEl.textContent = weddingData.groomFamily || 'عائلة السيد عبد الرحمن آل الشريف';
     if (brideFamEl) brideFamEl.textContent = weddingData.brideFamily || 'عائلة السيد مصطفى آل الأحمد';
 
-    // المونوغرام
+    // المونوغرام (للترويسة والإنترو)
     const monoEnEl = document.getElementById('monogram-letters-en');
     const monoArEl = document.getElementById('monogram-letters-ar');
     if (monoEnEl) monoEnEl.textContent = weddingData.monogramEn || 'M & H';
     if (monoArEl) monoArEl.textContent = weddingData.monogramAr || 'م & ح';
+
+    const introMonoEnEl = document.getElementById('intro-monogram-letters-en');
+    const introMonoArEl = document.getElementById('intro-monogram-letters-ar');
+    if (introMonoEnEl) introMonoEnEl.textContent = weddingData.monogramEn || 'M & H';
+    if (introMonoArEl) introMonoArEl.textContent = weddingData.monogramAr || 'م & ح';
 
     // رسالة الترحيب والآية الكريمة
     const welcomeEl = document.getElementById('text-welcome-phrase');
@@ -192,16 +197,71 @@ function initOceanVideoIntro() {
 }
 
 // ==========================================================================
-// 2. التحكم بالصوت والموسيقى البحرية (Audio Engine)
+// 2. التحكم بالصوت والموسيقى وإدارة دورة حياة الصوت عند الخروج
 // ==========================================================================
+let wasAudioPlayingBeforeHide = false;
+
 function initMediaControls() {
-    const audio = document.getElementById('bg-audio');
     const audioBtn = document.getElementById('btn-toggle-audio');
 
-    if (!audioBtn) return;
+    if (audioBtn) {
+        audioBtn.addEventListener('click', function() {
+            toggleAudioPlayback();
+        });
+    }
 
-    audioBtn.addEventListener('click', function() {
-        toggleAudioPlayback();
+    // ربط مستمعات دورة حياة الصوت لضمان انطفائه عند الخروج من المتصفح أو قفل الشاشة
+    initAudioLifecycle();
+}
+
+function initAudioLifecycle() {
+    const audio = document.getElementById('bg-audio');
+    const video = document.getElementById('intro-video-player');
+
+    // 1. مراقبة مغادرة الصفحة أو تصغير المتصفح أو إقفال الشاشة (Page Visibility API)
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            // المستخدم خرج من المتصفح أو بدل التطبيق: إيقاف الصوت فوراً وبشكل حاسم
+            if (audio && !audio.paused) {
+                wasAudioPlayingBeforeHide = true;
+                audio.pause();
+                updateAudioButtonUI(false);
+            } else {
+                wasAudioPlayingBeforeHide = false;
+            }
+            if (video && !video.paused) {
+                video.pause();
+            }
+        } else {
+            // عودة المستخدم للمتصفح: استئناف تشغيل الصوت إذا كان يعمل قبل المغادرة
+            if (wasAudioPlayingBeforeHide && audio) {
+                audio.play().then(() => {
+                    isAudioPlaying = true;
+                    updateAudioButtonUI(true);
+                }).catch(() => {});
+            }
+        }
+    });
+
+    // 2. حدث مغادرة الصفحة كلياً أو إغلاق التبويب على الهواتف (pagehide)
+    window.addEventListener('pagehide', function() {
+        if (audio) audio.pause();
+        if (video) video.pause();
+    });
+
+    // 3. حدث قبل تفريغ الصفحة (beforeunload)
+    window.addEventListener('beforeunload', function() {
+        if (audio) audio.pause();
+        if (video) video.pause();
+    });
+
+    // 4. حدث فقدان التركيز على النافذة (blur) على متصفحات الهواتف وتطبيقات المراسلة
+    window.addEventListener('blur', function() {
+        if (document.hidden && audio && !audio.paused) {
+            wasAudioPlayingBeforeHide = true;
+            audio.pause();
+            updateAudioButtonUI(false);
+        }
     });
 }
 
